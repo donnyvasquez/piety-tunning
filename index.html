@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camino a la Piedad: Aplicación Interactiva</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Sober Contemplation -->
+    <!-- Application Structure Plan: He diseñado la aplicación como un panel de control para el crecimiento espiritual. La estructura consta de una barra de navegación lateral fija que enumera las 10 unidades de estudio, permitiendo un acceso no lineal e inmediato a cualquier tema. El área de contenido principal muestra dinámicamente la unidad seleccionada. Cada unidad se divide en tres secciones claras: la 'Introducción' teológica, las 'Tareas Prácticas' interactivas presentadas en formato de acordeón para fomentar la participación activa en lugar de la lectura pasiva, y una sección de 'Fundamento Bíblico'. Esta arquitectura fue elegida para transformar un documento lineal en una herramienta de estudio personal y enfocada, donde el usuario puede concentrarse en las áreas de mayor relevancia para su santificación personal, facilitando una experiencia de usuario más intuitiva y reflexiva. -->
+    <!-- Visualization & Content Choices: Información del Informe: Las 10 unidades de estudio sobre la santificación. -> Objetivo: Crear un mapa visual del temario y un punto central de navegación. -> Método de Visualización: Un gráfico de dona (Doughnut Chart) con Chart.js/Canvas, donde cada uno de los 10 segmentos representa una unidad temática. -> Interacción: Al hacer clic en un segmento del gráfico, se navega a la unidad correspondiente, y viceversa. -> Justificación: Este gráfico no representa datos cuantitativos, sino que funciona como un ancla visual que comunica la naturaleza integral del "Camino a la Piedad", mostrando cómo cada área forma parte de un todo unificado en el proceso de santificación. Para las 'Tareas Prácticas', que son textuales, se eligió un formato de acordeón (HTML/CSS/JS) para organizar la información de forma limpia y promover la interacción directa del usuario con cada punto de autoexamen. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #F8F6F2;
+            color: #403A3A;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Merriweather', serif;
+            color: #2F2A2A;
+        }
+        .nav-item {
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-item.active {
+            background-color: #EAE3D9;
+            color: #A97A50;
+            border-right: 4px solid #A97A50;
+        }
+        .nav-item:not(.active):hover {
+            background-color: #F1ECE6;
+        }
+        .accordion-header {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .accordion-header:hover {
+            background-color: #F1ECE6;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 450px;
+        }
+        @media (min-width: 640px) {
+            .chart-container {
+                height: 450px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="flex flex-col lg:flex-row min-h-screen">
+        <nav class="w-full lg:w-1/4 xl:w-1/5 bg-[#F0EBE4] shadow-md border-r border-gray-200/50 flex-shrink-0">
+            <div class="p-6 border-b border-gray-300/60">
+                <h2 class="text-2xl font-bold text-center">Camino a la Piedad</h2>
+                <p class="text-sm text-center text-gray-600 mt-1">Un temario para la santificación</p>
+            </div>
+            <ul id="navigation-menu" class="space-y-1 p-2">
+                <li><a href="#" data-unit="unit-0" class="nav-item block p-4 rounded-lg font-semibold text-gray-700 active">Introducción General</a></li>
+                <li><a href="#" data-unit="unit-1" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">1. La Pureza de la Adoración</a></li>
+                <li><a href="#" data-unit="unit-2" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">2. Lucha contra el Pecado</a></li>
+                <li><a href="#" data-unit="unit-3" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">3. Gobernando las Afecciones</a></li>
+                <li><a href="#" data-unit="unit-4" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">4. La Batalla por la Mente</a></li>
+                <li><a href="#" data-unit="unit-5" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">5. La Pureza Sexual</a></li>
+                <li><a href="#" data-unit="unit-6" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">6. Patrones de Pecado</a></li>
+                <li><a href="#" data-unit="unit-7" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">7. Mayordomía Fiel</a></li>
+                <li><a href="#" data-unit="unit-8" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">8. El Cuidado del Templo</a></li>
+                <li><a href="#" data-unit="unit-9" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">9. Viviendo en Comunidad</a></li>
+                <li><a href="#" data-unit="unit-10" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">10. Identidad y Propósito</a></li>
+            </ul>
+        </nav>
+
+        <main id="content-area" class="w-full lg:w-3/4 xl:w-4/5 p-6 sm:p-8 md:p-12 overflow-y-auto">
+            
+            <section id="unit-0" class="unit-content">
+                <h1 class="text-4xl font-bold mb-4">Un Instrumento para la Santificación</h1>
+                <p class="text-lg text-gray-700 leading-relaxed mb-6">
+                    La vida cristiana no es un programa de superación personal, sino un proceso de transformación sobrenatural llamado santificación. Es la obra progresiva del Espíritu Santo mediante la cual somos conformados a la imagen de Cristo. Este temario no ofrece fórmulas mágicas, sino que busca ser un instrumento para el autoexamen bíblico, la oración y la obediencia. El objetivo no es meramente alcanzar una "sanidad interior", sino crecer en piedad, mortificando el pecado que aún mora en nosotros y viviendo para la gloria de Aquel que nos compró con Su sangre.
+                </p>
+                <div class="bg-white/70 p-6 rounded-2xl shadow-sm border border-gray-200/80">
+                    <h3 class="text-2xl font-bold mb-4 text-center">Las Diez Áreas de Crecimiento</h3>
+                    <p class="text-center text-gray-600 mb-6">Este gráfico representa las diez áreas fundamentales del temario. Cada sección es una parte integral del camino a la piedad. Haga clic en un segmento para explorar la unidad correspondiente.</p>
+                    <div class="chart-container">
+                        <canvas id="overviewChart"></canvas>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="unit-1" class="unit-content hidden">
+                <h1 class="text-4xl font-bold mb-2">Unidad 1: La Pureza de Nuestra Adoración</h1>
+                <p class="text-lg text-gray-500 mb-6">(Fe y Vida Espiritual)</p>
+                
+                <div class="bg-white/70 p-6 rounded-2xl shadow-sm border border-gray-200/80 mb-8">
+                    <h3 class="text-2xl font-bold mb-3">Introducción a la Unidad</h3>
+                    <p class="text-gray-700 leading-relaxed">El primer y más grande mandamiento es amar a Dios con todo nuestro ser. Toda nuestra vida debe ser un acto de adoración. Sin embargo, nuestro corazón caído es una fábrica de ídolos, y fácilmente nos desviamos hacia formas de adoración corruptas. Ya sea a través del ocultismo explícito o de la religiosidad sutil que pone la confianza en ritos y no en Cristo, cualquier cosa que desvíe nuestra fe del Dios Trino revelado en las Escrituras es idolatría. Nuestra primera responsabilidad como creyentes es derribar esos ídolos, arrepentirnos de nuestra autosuficiencia y volver a una adoración en espíritu y en verdad, fundamentada solo en Cristo.</p>
+                </div>
+                
+                <h3 class="text-2xl font-bold mb-4">Tareas Prácticas</h3>
+                <div class="space-y-3">
+                    <div class="bg-white/70 rounded-2xl border border-gray-200/80 shadow-sm">
+                        <div class="accordion-header p-5 flex justify-between items-center">
+                            <h4 class="font-semibold text-lg">1. Examen de Idolatría</h4>
+                            <span class="text-2xl font-light text-gray-500 transform transition-transform duration-300">+</span>
+                        </div>
+                        <div class="accordion-content px-5 pb-5">
+                            <p class="text-gray-600">Conforme a Éxodo 20:3-6, examina tu vida en busca de ídolos. Anota cualquier práctica (astrología, amuletos, supersticiones) o persona (líder espiritual, familiar) en la que hayas depositado una confianza que solo le corresponde a Dios. Identifica objetos en tu posesión que estén ligados a falsas religiones o al ocultismo y, en un acto de obediencia, destrúyelos como hicieron los creyentes en Hechos 19:19.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white/70 rounded-2xl border border-gray-200/80 shadow-sm">
+                        <div class="accordion-header p-5 flex justify-between items-center">
+                            <h4 class="font-semibold text-lg">2. Oración de Arrepentimiento y Consagración</h4>
+                            <span class="text-2xl font-light text-gray-500 transform transition-transform duration-300">+</span>
+                        </div>
+                        <div class="accordion-content px-5 pb-5">
+                            <p class="text-gray-600">Ora confesando específicamente cada forma de idolatría y falsa confianza. Renuncia a ellas y a toda influencia espiritual que no provenga del Espíritu Santo. Consagra nuevamente tu vida, tu mente, tu voluntad y tu futuro al señorío exclusivo de Jesucristo.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white/70 rounded-2xl border border-gray-200/80 shadow-sm">
+                        <div class="accordion-header p-5 flex justify-between items-center">
+                            <h4 class="font-semibold text-lg">3. Análisis de la Ortodoxia Práctica</h4>
+                            <span class="text-2xl font-light text-gray-500 transform transition-transform duration-300">+</span>
+                        </div>
+                        <div class="accordion-content px-5 pb-5">
+                            <p class="text-gray-600">Evalúa tu vida de iglesia. ¿Tu participación se basa en la costumbre y la apariencia (religiosidad), o en un amor genuino por Cristo y Su pueblo? ¿Manifiestas un espíritu enseñable y sumiso a la predicación de la Palabra, o uno crítico y rebelde?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50/50 border-l-4 border-[#A97A50] p-6 rounded-xl mt-8">
+                     <h4 class="font-bold text-lg mb-2">Fundamento Bíblico</h4>
+                     <p class="text-gray-700 italic">"No tendrás dioses ajenos delante de mí. No te harás imagen, ni ninguna semejanza de lo que esté arriba en el cielo, ni abajo en la tierra..."</p>
+                     <p class="text-right font-semibold text-sm mt-2 text-gray-600">- Éxodo 20:3-4</p>
+                </div>
+            </section>
+            
+            <section id="unit-2" class="unit-content hidden">
+                 <h1 class="text-4xl font-bold mb-2">Unidad 2: La Lucha contra el Pecado que Mora en Nosotros</h1>
+                <p class="text-lg text-gray-500 mb-6">(Hábitos Pecaminosos)</p>
+
+                <div class="bg-white/70 p-6 rounded-2xl shadow-sm border border-gray-200/80 mb-8">
+                    <h3 class="text-2xl font-bold mb-3">Introducción a la Unidad</h3>
+                    <p class="text-gray-700 leading-relaxed">La justificación nos declara justos ante Dios, pero no erradica la presencia del pecado en nuestra carne. El creyente se encuentra en una batalla constante: el Espíritu lucha contra la carne, y la carne contra el Espíritu. Los "hábitos pecaminosos" no son meros defectos de carácter, sino las manifestaciones externas de la corrupción que aún reside en nosotros. La victoria no se encuentra en nuestra fuerza de voluntad, sino en la "mortificación del pecado por el Espíritu". Nuestra responsabilidad es no hacer provisión para la carne, sino, por fe, considerarnos muertos al pecado y vivos para Dios en Cristo Jesús.</p>
+                </div>
+                
+                <h3 class="text-2xl font-bold mb-4">Tareas Prácticas</h3>
+                <div class="space-y-3">
+                    <div class="bg-white/70 rounded-2xl border border-gray-200/80 shadow-sm">
+                        <div class="accordion-header p-5 flex justify-between items-center">
+                            <h4 class="font-semibold text-lg">1. Identificación de las Obras de la Carne</h4>
+                            <span class="text-2xl font-light text-gray-500 transform transition-transform duration-300">+</span>
+                        </div>
+                        <div class="accordion-content px-5 pb-5">
+                            <p class="text-gray-600">Lee Gálatas 5:19-21. Honestamente, identifica cuáles de estas "obras de la carne" se manifiestan habitualmente en tu vida (ira, contiendas, celos, inmoralidad, etc.). Analiza las circunstancias (personas, lugares, estados de ánimo) que suelen preceder a la caída en estos pecados.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white/70 rounded-2xl border border-gray-200/80 shadow-sm">
+                        <div class="accordion-header p-5 flex justify-between items-center">
+                            <h4 class="font-semibold text-lg">2. Examen del Corazón (Orgullo y Rebeldía)</h4>
+                            <span class="text-2xl font-light text-gray-500 transform transition-transform duration-300">+</span>
+                        </div>
+                        <div class="accordion-content px-5 pb-5">
+                            <p class="text-gray-600">El orgullo es la raíz de toda desobediencia. Evalúa tu respuesta a la corrección, tu disposición a someterte a la autoridad bíblica y tu rapidez para confesar tus faltas. Reflexiona sobre cómo tu orgullo te lleva a justificarte en lugar de arrepentirte.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white/70 rounded-2xl border border-gray-200/80 shadow-sm">
+                        <div class="accordion-header p-5 flex justify-between items-center">
+                            <h4 class="font-semibold text-lg">3. Disciplina del Arrepentimiento</h4>
+                            <span class="text-2xl font-light text-gray-500 transform transition-transform duration-300">+</span>
+                        </div>
+                        <div class="accordion-content px-5 pb-5">
+                            <p class="text-gray-600">Practica la confesión diaria y específica de tus pecados a Dios (1 Juan 1:9). Define pasos prácticos y radicales para "hacer morir" las prácticas pecaminosas (Ej. cortar una amistad, cambiar una rutina). Si has pecado contra otros, busca la reconciliación y haz restitución, como un fruto visible de tu arrepentimiento (Lucas 19:8).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50/50 border-l-4 border-[#A97A50] p-6 rounded-xl mt-8">
+                     <h4 class="font-bold text-lg mb-2">Fundamento Bíblico</h4>
+                     <p class="text-gray-700 italic">"Así también vosotros consideraos muertos al pecado, pero vivos para Dios en Cristo Jesús, Señor nuestro. No reine, pues, el pecado en vuestro cuerpo mortal, de modo que lo obedezcáis en sus concupiscencias."</p>
+                     <p class="text-right font-semibold text-sm mt-2 text-gray-600">- Romanos 6:11-12</p>
+                </div>
+            </section>
+            
+            <section id="unit-3" class="unit-content hidden"></section>
+            <section id="unit-4" class="unit-content hidden"></section>
+            <section id="unit-5" class="unit-content hidden"></section>
+            <section id="unit-6" class="unit-content hidden"></section>
+            <section id="unit-7" class="unit-content hidden"></section>
+            <section id="unit-8" class="unit-content hidden"></section>
+            <section id="unit-9" class="unit-content hidden"></section>
+            <section id="unit-10" class="unit-content hidden"></section>
+        </main>
+    </div>
+
+<script>
+    const unitsData = {
+        "unit-3": {
+            title: "Unidad 3: Gobernando las Afecciones del Corazón",
+            subtitle: "(Las Emociones)",
+            intro: "El hombre fue creado a imagen de un Dios que siente: amor, gozo, ira santa. Nuestras emociones, por tanto, eran originalmente buenas. Sin embargo, la Caída las ha torcido. Ahora, el temor, la amargura, la ansiedad y la ira pecaminosa a menudo gobiernan nuestro corazón. El evangelio no nos llama a una vida sin emociones, sino a la redención de nuestras emociones. Nuestra responsabilidad no es ser guiados por lo que sentimos, sino someter nuestros sentimientos a la verdad de la Palabra de Dios, confesando las emociones pecaminosas y cultivando activamente el fruto del Espíritu, cuyo origen no está en nuestras circunstancias, sino en nuestra unión con Cristo.",
+            tasks: [
+                { title: "1. Examinando el Corazón a la Luz de la Escritura", content: "Identifica las emociones pecaminosas que más luchas en tu corazón (amargura, envidia, ansiedad, etc.). Junto a cada una, escribe lo que la Palabra de Dios manda al respecto (Ej. Amargura vs. Efesios 4:31-32). Rastrea la raíz de esa amargura o temor. ¿Qué ofensa no has perdonado? ¿Qué ídolo (seguridad, control, aprobación) está siendo amenazado?" },
+                { title: "2. La Disciplina del Perdón", content: "El perdón no es un sentimiento, es un mandato que se obedece por fe. Haz una lista de las personas que te han ofendido. En oración, declara tu decisión de perdonar a cada una, no porque lo sientan o lo merezcan, sino porque Cristo te perdonó a ti. Renuncia a tu derecho de juicio y entrégalos a la justicia de Dios." },
+                { title: "3. Cultivando el Fruto del Espíritu", content: "En lugar de enfocarte en 'no sentirte mal', enfócate en cultivar el gozo, la paz y la paciencia. Memoriza un pasaje que hable de la paz o el gozo en Cristo (Ej. Filipenses 4:6-7) y medita en él cuando seas asaltado por emociones negativas. Declara la verdad de Dios sobre tus sentimientos." }
+            ],
+            scripture: { verse: "Sobre toda cosa guardada, guarda tu corazón; Porque de él mana la vida.", ref: "- Proverbios 4:23" }
+        },
+        "unit-4": {
+            title: "Unidad 4: La Batalla por la Mente: Renovación por la Verdad",
+            subtitle: "(La Mente)",
+            intro: "Antes de Cristo, nuestra mente estaba 'entenebrecida' y seguía 'la corriente de este mundo'. La conversión inicia un proceso de renovación que debe ser cultivado intencionalmente. La batalla espiritual se libra en gran medida en el terreno de las ideas. Satanás, el 'padre de mentira', siembra dudas y acusaciones para apartarnos de la devoción a Cristo. Nuestra responsabilidad es disciplinar nuestra mente, demoliendo toda fortaleza de pensamiento que se oponga a la verdad de Dios y saturándola con la sana doctrina de las Escrituras para ser transformados.",
+            tasks: [
+                { title: "1. Auditoría de Pensamientos", content: "Durante esta semana, identifica los patrones de pensamiento dominantes en tu mente. ¿Son de incredulidad, temor, lujuria, crítica o autocompasión? Evalúa qué 'fuentes' están alimentando tu mente: ¿qué programas ves, qué música escuchas, qué lees? ¿Están alineadas con Filipenses 4:8?" },
+                { title: "2. Sometiendo la Mente a la Verdad de Cristo", content: "Crea una 'lista de batalla'. En una columna, escribe la mentira recurrente (Ej. 'Dios no me perdonará'). En la otra, la verdad bíblica que la refuta (Ej. 'Si confesamos nuestros pecados, él es fiel y justo para perdonar...' - 1 Juan 1:9). Cuando un pensamiento mentiroso te asalte, úsalo como un recordatorio para orar y declarar la verdad." },
+                { title: "3. La Disciplina de la Meditación Bíblica", content: "Elige un libro corto de la Biblia (Ej. Filipenses) y léelo repetidamente durante un mes. El objetivo es que la Palabra de Dios more en abundancia en ti. Memoriza al menos un versículo por semana. La Palabra guardada en el corazón es nuestra mayor defensa contra el pecado (Salmo 119:11)." }
+            ],
+            scripture: { verse: "No os conforméis a este siglo, sino transformaos por medio de la renovación de vuestro entendimiento, para que comprobéis cuál sea la buena voluntad de Dios, agradable y perfecta.", ref: "- Romanos 12:2" }
+        },
+        "unit-5": {
+            title: "Unidad 5: La Pureza Sexual en un Mundo Caído",
+            subtitle: "(Sexualidad)",
+            intro: "Dios creó la sexualidad como algo bueno, reservado para el pacto matrimonial. Sin embargo, no hay área que el pecado haya pervertido más. La inmoralidad sexual, en todas sus formas, es una rebelión contra el diseño de nuestro Creador y un pecado contra nuestro propio cuerpo. Como creyentes, no estamos llamados a 'manejar' nuestra lujuria, sino a 'huir' de la inmoralidad. Esto demanda una guerra sin cuartel, tomando medidas radicales para guardar nuestro corazón y presentar nuestros cuerpos como sacrificio vivo y santo a Dios.",
+            tasks: [
+                { title: "1. Confesión Radical", content: "Ante Dios, confiesa con honestidad y sin excusas toda implicación en la inmoralidad sexual. Llama al pecado por su nombre: adulterio, fornicación, pornografía, etc. Haz una lista de todas las uniones sexuales ilícitas y, en oración, rompe esos lazos espirituales y emocionales." },
+                { title: "2. Erradicación de Provisiones para la Carne", content: "Identifica y elimina radicalmente todas las fuentes de tentación sexual. Esto es una acción de guerra: desecha material pornográfico, cancela suscripciones, instala filtros, elimina contactos, cambia tus rutinas. Establece un sistema de rendición de cuentas con un hermano maduro en la fe." },
+                { title: "3. Consagración del Cuerpo y los Sentidos", content: "Haz un pacto con tus ojos, como Job (Job 31:1), de no mirar con lujuria. Ora diariamente, consagrando tu cuerpo, tus ojos, tus manos y tu mente al servicio de Dios, pidiendo que el Espíritu Santo te llene y te dé dominio propio para honrar a Cristo con tu cuerpo." }
+            ],
+            scripture: { verse: "Huid de la fornicación. Cualquier otro pecado que el hombre cometa, está fuera del cuerpo; mas el que fornica, contra su propio cuerpo peca.", ref: "- 1 Corintios 6:18" }
+        },
+        "unit-6": {
+            title: "Unidad 6: Rompiendo los Patrones de Pecado Generacional",
+            subtitle: "(Consecuencias Heredadas)",
+            intro: "Las Escrituras enseñan que Dios 'castiga la iniquidad de los padres sobre los hijos'. No heredamos la culpa, pero sí podemos heredar consecuencias y patrones de conducta pecaminosos. Para el creyente, no hay 'maldición' que pueda separarlo del amor de Dios, pues 'Cristo nos redimió de la maldición de la ley'. Sin embargo, somos responsables de identificar las fortalezas de pecado aprendidas en nuestro entorno familiar, arrepentirnos de ellas y caminar en la libertad que Cristo ganó para nosotros.",
+            tasks: [
+                { title: "1. Análisis de Patrones Familiares", content: "Reflexiona sobre los pecados dominantes en tus generaciones pasadas (vicios, divorcios, ocultismo, violencia, etc.). Observa con honestidad cómo esos mismos patrones se manifiestan, incluso sutilmente, en tu propia vida y carácter." },
+                { title: "2. Confesión Vicaria y Personal", content: "Siguiendo el ejemplo de Daniel (Daniel 9:4-19), ora identificándote con los pecados de tu linaje, confesando la idolatría, inmoralidad y rebelión de tus padres y abuelos. Confiesa también tu propia participación y perpetuación de esos pecados." },
+                { title: "3. Apropiación de la Nueva Herencia en Cristo", content: "En oración, renuncia explícitamente a cada patrón de pecado generacional. Declara que, en Cristo, eres una nueva creación y que esos patrones ya no tienen autoridad sobre ti. Apropíate por fe de tu nueva herencia: en lugar de ira, la mansedumbre; en lugar de inmoralidad, la pureza." }
+            ],
+            scripture: { verse: "Cristo nos redimió de la maldición de la ley, hecho por nosotros maldición (porque está escrito: Maldito todo el que es colgado en un madero).", ref: "- Gálatas 3:13" }
+        },
+        "unit-7": {
+            title: "Unidad 7: Mayordomía Fiel",
+            subtitle: "(Finanzas)",
+            intro: "'Del Señor es la tierra y todo lo que hay en ella'. Este es el principio fundamental de la mayordomía cristiana. No somos dueños, somos administradores. Nuestra relación con el dinero es un indicador de nuestra relación con Dios. 'El amor al dinero es la raíz de toda clase de males' y no podemos servir a Dios y a las riquezas. Nuestra responsabilidad es administrar Sus recursos con fidelidad, generosidad, diligencia y contentamiento, buscando primero Su Reino.",
+            tasks: [
+                { title: "1. Examen del Corazón Financiero", content: "¿Buscas la seguridad en la acumulación de riquezas o en la providencia de Dios? ¿Amas el dinero o lo ves como una herramienta para la gloria de Dios? Confiesa la avaricia, la ansiedad, la envidia o el orgullo como pecados." },
+                { title: "2. Disciplina de la Mayordomía", content: "Diezmo: Honra a Dios con las primicias (Proverbios 3:9-10). Presupuesto: Crea un presupuesto detallado. Asigna a cada peso un propósito. Deudas: Elabora un plan para salir de deudas lo más pronto posible. El deudor es esclavo del acreedor (Proverbios 22:7)." },
+                { title: "3. Cultivo de la Generosidad y el Contentamiento", content: "Busca oportunidades para dar generosamente, más allá del diezmo, como un acto de adoración y confianza en Dios. Practica el contentamiento (Filipenses 4:11-13). Da gracias a Dios por lo que tienes en lugar de codiciar lo que no tienes." }
+            ],
+            scripture: { verse: "Porque donde esté vuestro tesoro, allí estará también vuestro corazón.", ref: "- Mateo 6:21" }
+        },
+        "unit-8": {
+            title: "Unidad 8: El Cuidado del Templo",
+            subtitle: "(Salud y Sanidad Física)",
+            intro: "'Nuestro cuerpo es templo del Espíritu Santo'. Aunque la enfermedad es consecuencia de la Caída, somos llamados a ser buenos mayordomos de los cuerpos que Dios nos ha dado. La negligencia, la glotonería y el abuso de nuestro cuerpo no glorifican a Dios. Si bien confiamos en el poder soberano de Dios para sanar, nuestra responsabilidad incluye cuidar de Su templo a través de la disciplina, el descanso y la sabiduría, y examinar nuestro corazón por raíces espirituales de enfermedad.",
+            tasks: [
+                { title: "1. Análisis de la Mayordomía Corporal", content: "Evalúa con honestidad cómo tratas tu cuerpo. ¿Honras a Dios con tu alimentación, tu descanso, tu ejercicio? ¿O abusas de él con excesos o negligencia? Confiesa la glotonería, la pereza o cualquier abuso como un pecado contra el Creador." },
+                { title: "2. Búsqueda de Raíces Espirituales", content: "Reflexiona si alguna dolencia crónica está ligada a un patrón de pecado, a una falta de perdón o a una ansiedad persistente. Un 'corazón apacible es vida para el cuerpo' (Proverbios 14:30). Lleva estas áreas a Dios en arrepentimiento." },
+                { title: "3. Plan de Cuidado del Templo", content: "Establece 1 o 2 metas realistas para mejorar el cuidado de tu cuerpo esta semana. En tus oraciones, presenta tus enfermedades a Dios. Pide sanidad con sumisión a Su voluntad soberana, pero con fe en Su poder, sabiendo que por la llaga de Cristo fuimos curados (Isaías 53:5)." }
+            ],
+            scripture: { verse: "¿O ignoráis que vuestro cuerpo es templo del Espíritu Santo, el cual está en vosotros, el cual tenéis de Dios, y que no sois vuestros? Porque habéis sido comprados por precio; glorificad, pues, a Dios en vuestro cuerpo.", ref: "- 1 Corintios 6:19-20" }
+        },
+        "unit-9": {
+            title: "Unidad 9: Viviendo el Evangelio en Comunidad",
+            subtitle: "(Relaciones Saludables)",
+            intro: "El cristianismo no es una fe solitaria; hemos sido llamados a un cuerpo, la Iglesia. Los mandatos de 'amarnos los unos a los otros' y 'soportarnos los unos a los otros' son el campo de pruebas de nuestra fe. Es en el crisol de las relaciones donde nuestro egoísmo es expuesto y donde tenemos la oportunidad de reflejar el amor sacrificial de Cristo. Nuestra responsabilidad es morir a nuestro egoísmo, a nuestros derechos y a nuestras ofensas para buscar activamente la paz y la edificación mutua.",
+            tasks: [
+                { title: "1. Auditoría Relacional", content: "Haz una lista de las relaciones rotas o tensas en tu vida. Al lado de cada nombre, escribe honestamente cuál ha sido tu pecado en esa relación (orgullo, ira, amargura, chisme, egoísmo)." },
+                { title: "2. Iniciando la Reconciliación", content: "Para cada relación, ora pidiendo perdón a Dios por tu parte. Toma la iniciativa de buscar la reconciliación (Mateo 5:23-24). Esto no significa que la otra persona responderá bien, pero tu responsabilidad es obedecer. Enfócate en confesar tu falta, no en señalar la del otro." },
+                { title: "3. La Disciplina del Amor Bíblico", content: "Lee 1 Corintios 13:4-7. Elige una persona con la que tienes una relación difícil. Durante esta semana, ora y busca una oportunidad para practicar activamente una de esas características del amor hacia esa persona (Ej. 'Señor, ayúdame a ser paciente con...')." }
+            ],
+            scripture: { verse: "Soportándoos unos a otros, y perdonándoos unos a otros si alguno tuviere queja contra otro. De la manera que Cristo os perdonó, así también hacedlo vosotros.", ref: "- Colosenses 3:13" }
+        },
+        "unit-10": {
+            title: "Unidad 10: Nuestra Identidad en Cristo y el Propósito de Glorificar a Dios",
+            subtitle: "(Identidad y Propósito)",
+            intro: "El mundo nos dice que busquemos nuestra identidad en nuestro interior. La Biblia enseña lo contrario: nuestra verdadera identidad solo se encuentra fuera de nosotros, 'en Cristo'. No somos definidos por nuestro pasado o nuestros sentimientos, sino por lo que Dios ha declarado que somos: hijos, herederos, justos. De igual manera, nuestro propósito no es encontrarnos a nosotros mismos, sino glorificar a Dios y disfrutar de Él para siempre. Nuestra responsabilidad es creer lo que Dios dice de nosotros y vivir cada día para el propósito para el cual fuimos creados.",
+            tasks: [
+                { title: "1. Renuncia a Falsas Identidades", content: "Escribe las etiquetas con las que te has definido (el fracasado, la víctima, el autosuficiente). En oración, renuncia a cada una de estas identidades falsas. Declara que tu única y verdadera identidad está en Cristo." },
+                { title: "2. Apropiación de la Identidad en Cristo", content: "Estudia pasajes como Efesios 1:3-14. Haz una lista de todo lo que la Palabra dice que eres en Cristo (escogido, amado, perdonado, hijo, santo, etc.). Elige 3 de estas verdades y medita en ellas durante la semana, pidiendo a Dios que selle estas verdades en tu corazón." },
+                { title: "3. Viviendo para el Propósito Supremo", content: "Evalúa tus ambiciones y metas a la luz del propósito de glorificar a Dios. ¿Tu carrera, tus hobbies, tus planes, están subordinados a este gran fin? Ora como en el Salmo 90:12: 'Enséñanos de tal modo a contar nuestros días, que traigamos al corazón sabiduría'. Pide a Dios que te muestre cómo glorificarlo en las tareas ordinarias de este día." }
+            ],
+            scripture: { verse: "Porque para mí el vivir es Cristo, y el morir es ganancia.", ref: "- Filipenses 1:21" }
+        },
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const contentArea = document.getElementById('content-area');
+
+        function createUnitHTML(unitId, data) {
+            let tasksHTML = data.tasks.map(task => `
+                <div class="bg-white/70 rounded-2xl border border-gray-200/80 shadow-sm">
+                    <div class="accordion-header p-5 flex justify-between items-center">
+                        <h4 class="font-semibold text-lg">${task.title}</h4>
+                        <span class="text-2xl font-light text-gray-500 transform transition-transform duration-300">+</span>
+                    </div>
+                    <div class="accordion-content px-5 pb-5">
+                        <p class="text-gray-600">${task.content}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            return `
+                <h1 class="text-4xl font-bold mb-2">${data.title}</h1>
+                <p class="text-lg text-gray-500 mb-6">${data.subtitle}</p>
+                <div class="bg-white/70 p-6 rounded-2xl shadow-sm border border-gray-200/80 mb-8">
+                    <h3 class="text-2xl font-bold mb-3">Introducción a la Unidad</h3>
+                    <p class="text-gray-700 leading-relaxed">${data.intro}</p>
+                </div>
+                <h3 class="text-2xl font-bold mb-4">Tareas Prácticas</h3>
+                <div class="space-y-3">${tasksHTML}</div>
+                <div class="bg-amber-50/50 border-l-4 border-[#A97A50] p-6 rounded-xl mt-8">
+                     <h4 class="font-bold text-lg mb-2">Fundamento Bíblico</h4>
+                     <p class="text-gray-700 italic">"${data.scripture.verse}"</p>
+                     <p class="text-right font-semibold text-sm mt-2 text-gray-600">${data.scripture.ref}</p>
+                </div>
+            `;
+        }
+        
+        for (const unitId in unitsData) {
+            document.getElementById(unitId).innerHTML = createUnitHTML(unitId, unitsData[unitId]);
+        }
+
+        const navLinks = document.querySelectorAll('#navigation-menu a');
+        const unitContents = document.querySelectorAll('.unit-content');
+        let myChart;
+
+        function showUnit(unitId) {
+            unitContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(unitId).classList.remove('hidden');
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.unit === unitId) {
+                    link.classList.add('active');
+                }
+            });
+
+            if (myChart) {
+                const unitIndex = parseInt(unitId.split('-')[1]);
+                myChart.setActiveElements([{ datasetIndex: 0, index: unitIndex }]);
+                myChart.update();
+            }
+        }
+        
+        function setupAccordions() {
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const icon = header.querySelector('span');
+                    
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        icon.style.transform = 'rotate(45deg)';
+                    }
+                });
+            });
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const unitId = link.dataset.unit;
+                showUnit(unitId);
+            });
+        });
+
+        function createChart() {
+            const ctx = document.getElementById('overviewChart').getContext('2d');
+            const labels = [
+                'Introducción', '1. Adoración', '2. Pecado', '3. Afecciones', '4. Mente', 
+                '5. Pureza Sexual', '6. Patrones', '7. Mayordomía', '8. Salud', '9. Comunidad', '10. Identidad'
+            ];
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Unidades',
+                        data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                        backgroundColor: [
+                            '#D8C4B0', '#A97A50', '#826C5C', '#C4AFA0', '#9D897A',
+                            '#B29A86', '#E4D5C7', '#C2AC99', '#A38F7E', '#8D7B6D', '#786A5F'
+                        ],
+                        borderColor: '#F8F6F2',
+                        borderWidth: 3,
+                        hoverOffset: 15,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            bodyFont: {
+                                size: 14,
+                                weight: 'bold',
+                                family: "'Lato', sans-serif"
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label;
+                                }
+                            }
+                        }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const clickedIndex = elements[0].index;
+                            const unitId = 'unit-' + clickedIndex;
+                            showUnit(unitId);
+                        }
+                    }
+                }
+            });
+        }
+
+        showUnit('unit-0');
+        setupAccordions();
+        createChart();
+    });
+</script>
+
+</body>
+</html>
