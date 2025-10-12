@@ -14,6 +14,9 @@
     <!-- Visualization & Content Choices: Información del Informe: Las 10 unidades de estudio sobre la santificación. -> Objetivo: Crear un mapa visual del temario y un punto central de navegación. -> Método de Visualización: Un gráfico de dona (Doughnut Chart) con Chart.js/Canvas, donde cada uno de los 10 segmentos representa una unidad temática. -> Interacción: Al hacer clic en un segmento del gráfico, se navega a la unidad correspondiente, y viceversa. -> Justificación: Este gráfico no representa datos cuantitativos, sino que funciona como un ancla visual que comunica la naturaleza integral del "Camino a la Piedad", mostrando cómo cada área forma parte de un todo unificado en el proceso de santificación. Para las 'Tareas Prácticas', que son textuales, se eligió un formato de acordeón (HTML/CSS/JS) para organizar la información de forma limpia y promover la interacción directa del usuario con cada punto de autoexamen. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc; /* slate-50 */
@@ -62,34 +65,39 @@
                 height: 450px;
             }
         }
+        .unit-content {
+            scroll-margin-top: 2rem;
+        }
     </style>
 </head>
 <body class="antialiased">
 
-    <div class="flex flex-col lg:flex-row min-h-screen">
-        <nav class="w-full lg:w-1/4 xl:w-1/5 bg-white border-r border-slate-200 flex-shrink-0">
-            <div class="p-6 border-b border-slate-200">
+    <div class="flex flex-col lg:flex-row lg:h-screen lg:overflow-hidden">
+        <nav class="w-full lg:w-1/4 xl:w-1/5 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col">
+            <div class="p-6 border-b border-slate-200 flex-shrink-0">
                 <h2 class="text-2xl font-bold text-center">Camino a la Piedad</h2>
                 <p class="text-sm text-center text-slate-500 mt-1">Un temario para la santificación</p>
             </div>
-            <ul id="navigation-menu" class="space-y-1 p-2">
-                <li><a href="#" data-unit="unit-0" class="nav-item block p-4 rounded-lg font-semibold text-slate-600 active">Introducción General</a></li>
-                <li><a href="#" data-unit="unit-1" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">1. La Pureza de la Adoración</a></li>
-                <li><a href="#" data-unit="unit-2" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">2. Lucha contra el Pecado</a></li>
-                <li><a href="#" data-unit="unit-3" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">3. Gobernando las Afecciones</a></li>
-                <li><a href="#" data-unit="unit-4" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">4. La Batalla por la Mente</a></li>
-                <li><a href="#" data-unit="unit-5" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">5. La Pureza Sexual</a></li>
-                <li><a href="#" data-unit="unit-6" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">6. Patrones de Pecado</a></li>
-                <li><a href="#" data-unit="unit-7" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">7. Mayordomía Fiel</a></li>
-                <li><a href="#" data-unit="unit-8" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">8. El Cuidado del Templo</a></li>
-                <li><a href="#" data-unit="unit-9" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">9. Viviendo en Comunidad</a></li>
-                <li><a href="#" data-unit="unit-10" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">10. Identidad y Propósito</a></li>
-            </ul>
+            <div class="overflow-y-auto flex-grow">
+                <ul id="navigation-menu" class="space-y-1 p-2">
+                    <li><a href="#unit-0" data-unit="unit-0" class="nav-item block p-4 rounded-lg font-semibold text-slate-600 active">Introducción General</a></li>
+                    <li><a href="#unit-1" data-unit="unit-1" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">1. La Pureza de la Adoración</a></li>
+                    <li><a href="#unit-2" data-unit="unit-2" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">2. Lucha contra el Pecado</a></li>
+                    <li><a href="#unit-3" data-unit="unit-3" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">3. Gobernando las Afecciones</a></li>
+                    <li><a href="#unit-4" data-unit="unit-4" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">4. La Batalla por la Mente</a></li>
+                    <li><a href="#unit-5" data-unit="unit-5" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">5. La Pureza Sexual</a></li>
+                    <li><a href="#unit-6" data-unit="unit-6" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">6. Patrones de Pecado</a></li>
+                    <li><a href="#unit-7" data-unit="unit-7" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">7. Mayordomía Fiel</a></li>
+                    <li><a href="#unit-8" data-unit="unit-8" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">8. El Cuidado del Templo</a></li>
+                    <li><a href="#unit-9" data-unit="unit-9" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">9. Viviendo en Comunidad</a></li>
+                    <li><a href="#unit-10" data-unit="unit-10" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">10. Identidad y Propósito</a></li>
+                </ul>
+            </div>
         </nav>
 
-        <main id="content-area" class="w-full lg:w-3/4 xl:w-4/5 p-6 sm:p-8 md:p-12 overflow-y-auto">
+        <main id="content-area" class="w-full lg:w-3/4 xl:w-4/5 p-6 sm:p-8 md:p-12 lg:overflow-y-auto">
             
-            <section id="unit-0" class="unit-content">
+            <section id="unit-0" class="unit-content mb-16">
                 <h1 class="text-4xl font-bold mb-4">Un Instrumento para la Santificación</h1>
                 <p class="text-lg text-slate-600 leading-relaxed mb-8">
                     La vida cristiana no es un programa de superación personal, sino un proceso de transformación sobrenatural llamado santificación. Es la obra progresiva del Espíritu Santo mediante la cual somos conformados a la imagen de Cristo. Este temario no ofrece fórmulas mágicas, sino que busca ser un instrumento para el autoexamen bíblico, la oración y la obediencia. El objetivo no es meramente alcanzar una "sanidad interior", sino crecer en piedad, mortificando el pecado que aún mora en nosotros y viviendo para la gloria de Aquel que nos compró con Su sangre.
@@ -103,7 +111,7 @@
                 </div>
             </section>
             
-            <section id="unit-1" class="unit-content hidden">
+            <section id="unit-1" class="unit-content mb-16">
                 <h1 class="text-4xl font-bold mb-2">Unidad 1: La Pureza de Nuestra Adoración</h1>
                 <p class="text-lg text-slate-500 mb-6">(Fe y Vida Espiritual)</p>
                 
@@ -150,7 +158,7 @@
                 </div>
             </section>
             
-            <section id="unit-2" class="unit-content hidden">
+            <section id="unit-2" class="unit-content mb-16">
                  <h1 class="text-4xl font-bold mb-2">Unidad 2: La Lucha contra el Pecado que Mora en Nosotros</h1>
                 <p class="text-lg text-slate-500 mb-6">(Hábitos Pecaminosos)</p>
 
@@ -197,20 +205,14 @@
                 </div>
             </section>
             
-            <section id="unit-3" class="unit-content hidden"></section>
-            <section id="unit-4" class="unit-content hidden"></section>
-            <section id="unit-5" class="unit-content hidden"></section>
-            <section id="unit-6" class="unit-content hidden"></section>
-            <section id="unit-7" class="unit-content hidden"></section>
-            <section id="unit-8" class="unit-content hidden"></section>
-            <section id="unit-9" class="unit-content hidden"></section>
-            <section id="unit-10" class="unit-content hidden"></section>
+            <div id="dynamic-units"></div>
         </main>
     </div>
 
 <script>
     const unitsData = {
         "unit-3": {
+            id: "unit-3",
             title: "Unidad 3: Gobernando las Afecciones del Corazón",
             subtitle: "(Las Emociones)",
             intro: "El hombre fue creado a imagen de un Dios que siente: amor, gozo, ira santa. Nuestras emociones, por tanto, eran originalmente buenas. Sin embargo, la Caída las ha torcido. Ahora, el temor, la amargura, la ansiedad y la ira pecaminosa a menudo gobiernan nuestro corazón. El evangelio no nos llama a una vida sin emociones, sino a la redención de nuestras emociones. Nuestra responsabilidad no es ser guiados por lo que sentimos, sino someter nuestros sentimientos a la verdad de la Palabra de Dios, confesando las emociones pecaminosas y cultivando activamente el fruto del Espíritu, cuyo origen no está en nuestras circunstancias, sino en nuestra unión con Cristo.",
@@ -222,6 +224,7 @@
             scripture: { verse: "Sobre toda cosa guardada, guarda tu corazón; Porque de él mana la vida.", ref: "- Proverbios 4:23" }
         },
         "unit-4": {
+            id: "unit-4",
             title: "Unidad 4: La Batalla por la Mente: Renovación por la Verdad",
             subtitle: "(La Mente)",
             intro: "Antes de Cristo, nuestra mente estaba 'entenebrecida' y seguía 'la corriente de este mundo'. La conversión inicia un proceso de renovación que debe ser cultivado intencionalmente. La batalla espiritual se libra en gran medida en el terreno de las ideas. Satanás, el 'padre de mentira', siembra dudas y acusaciones para apartarnos de la devoción a Cristo. Nuestra responsabilidad es disciplinar nuestra mente, demoliendo toda fortaleza de pensamiento que se oponga a la verdad de Dios y saturándola con la sana doctrina de las Escrituras para ser transformados.",
@@ -233,6 +236,7 @@
             scripture: { verse: "No os conforméis a este siglo, sino transformaos por medio de la renovación de vuestro entendimiento, para que comprobéis cuál sea la buena voluntad de Dios, agradable y perfecta.", ref: "- Romanos 12:2" }
         },
         "unit-5": {
+            id: "unit-5",
             title: "Unidad 5: La Pureza Sexual en un Mundo Caído",
             subtitle: "(Sexualidad)",
             intro: "Dios creó la sexualidad como algo bueno, reservado para el pacto matrimonial. Sin embargo, no hay área que el pecado haya pervertido más. La inmoralidad sexual, en todas sus formas, es una rebelión contra el diseño de nuestro Creador y un pecado contra nuestro propio cuerpo. Como creyentes, no estamos llamados a 'manejar' nuestra lujuria, sino a 'huir' de la inmoralidad. Esto demanda una guerra sin cuartel, tomando medidas radicales para guardar nuestro corazón y presentar nuestros cuerpos como sacrificio vivo y santo a Dios.",
@@ -244,6 +248,7 @@
             scripture: { verse: "Huid de la fornicación. Cualquier otro pecado que el hombre cometa, está fuera del cuerpo; mas el que fornica, contra su propio cuerpo peca.", ref: "- 1 Corintios 6:18" }
         },
         "unit-6": {
+            id: "unit-6",
             title: "Unidad 6: Rompiendo los Patrones de Pecado Generacional",
             subtitle: "(Consecuencias Heredadas)",
             intro: "Las Escrituras enseñan que Dios 'castiga la iniquidad de los padres sobre los hijos'. No heredamos la culpa, pero sí podemos heredar consecuencias y patrones de conducta pecaminosos. Para el creyente, no hay 'maldición' que pueda separarlo del amor de Dios, pues 'Cristo nos redimió de la maldición de la ley'. Sin embargo, somos responsables de identificar las fortalezas de pecado aprendidas en nuestro entorno familiar, arrepentirnos de ellas y caminar en la libertad que Cristo ganó para nosotros.",
@@ -255,6 +260,7 @@
             scripture: { verse: "Cristo nos redimió de la maldición de la ley, hecho por nosotros maldición (porque está escrito: Maldito todo el que es colgado en un madero).", ref: "- Gálatas 3:13" }
         },
         "unit-7": {
+            id: "unit-7",
             title: "Unidad 7: Mayordomía Fiel",
             subtitle: "(Finanzas)",
             intro: "'Del Señor es la tierra y todo lo que hay en ella'. Este es el principio fundamental de la mayordomía cristiana. No somos dueños, somos administradores. Nuestra relación con el dinero es un indicador de nuestra relación con Dios. 'El amor al dinero es la raíz de toda clase de males' y no podemos servir a Dios y a las riquezas. Nuestra responsabilidad es administrar Sus recursos con fidelidad, generosidad, diligencia y contentamiento, buscando primero Su Reino.",
@@ -266,6 +272,7 @@
             scripture: { verse: "Porque donde esté vuestro tesoro, allí estará también vuestro corazón.", ref: "- Mateo 6:21" }
         },
         "unit-8": {
+            id: "unit-8",
             title: "Unidad 8: El Cuidado del Templo",
             subtitle: "(Salud y Sanidad Física)",
             intro: "'Nuestro cuerpo es templo del Espíritu Santo'. Aunque la enfermedad es consecuencia de la Caída, somos llamados a ser buenos mayordomos de los cuerpos que Dios nos ha dado. La negligencia, la glotonería y el abuso de nuestro cuerpo no glorifican a Dios. Si bien confiamos en el poder soberano de Dios para sanar, nuestra responsabilidad incluye cuidar de Su templo a través de la disciplina, el descanso y la sabiduría, y examinar nuestro corazón por raíces espirituales de enfermedad.",
@@ -277,6 +284,7 @@
             scripture: { verse: "¿O ignoráis que vuestro cuerpo es templo del Espíritu Santo, el cual está en vosotros, el cual tenéis de Dios, y que no sois vuestros? Porque habéis sido comprados por precio; glorificad, pues, a Dios en vuestro cuerpo.", ref: "- 1 Corintios 6:19-20" }
         },
         "unit-9": {
+            id: "unit-9",
             title: "Unidad 9: Viviendo el Evangelio en Comunidad",
             subtitle: "(Relaciones Saludables)",
             intro: "El cristianismo no es una fe solitaria; hemos sido llamados a un cuerpo, la Iglesia. Los mandatos de 'amarnos los unos a los otros' y 'soportarnos los unos a los otros' son el campo de pruebas de nuestra fe. Es en el crisol de las relaciones donde nuestro egoísmo es expuesto y donde tenemos la oportunidad de reflejar el amor sacrificial de Cristo. Nuestra responsabilidad es morir a nuestro egoísmo, a nuestros derechos y a nuestras ofensas para buscar activamente la paz y la edificación mutua.",
@@ -288,6 +296,7 @@
             scripture: { verse: "Soportándoos unos a otros, y perdonándoos unos a otros si alguno tuviere queja contra otro. De la manera que Cristo os perdonó, así también hacedlo vosotros.", ref: "- Colosenses 3:13" }
         },
         "unit-10": {
+            id: "unit-10",
             title: "Unidad 10: Nuestra Identidad en Cristo y el Propósito de Glorificar a Dios",
             subtitle: "(Identidad y Propósito)",
             intro: "El mundo nos dice que busquemos nuestra identidad en nuestro interior. La Biblia enseña lo contrario: nuestra verdadera identidad solo se encuentra fuera de nosotros, 'en Cristo'. No somos definidos por nuestro pasado o nuestros sentimientos, sino por lo que Dios ha declarado que somos: hijos, herederos, justos. De igual manera, nuestro propósito no es encontrarnos a nosotros mismos, sino glorificar a Dios y disfrutar de Él para siempre. Nuestra responsabilidad es creer lo que Dios dice de nosotros y vivir cada día para el propósito para el cual fuimos creados.",
@@ -301,9 +310,9 @@
     };
 
     document.addEventListener('DOMContentLoaded', () => {
-        const contentArea = document.getElementById('content-area');
+        const dynamicUnitsContainer = document.getElementById('dynamic-units');
 
-        function createUnitHTML(unitId, data) {
+        function createUnitHTML(data) {
             let tasksHTML = data.tasks.map(task => `
                 <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
                     <div class="accordion-header p-5 flex justify-between items-center">
@@ -317,49 +326,31 @@
             `).join('');
 
             return `
-                <h1 class="text-4xl font-bold mb-2">${data.title}</h1>
-                <p class="text-lg text-slate-500 mb-6">${data.subtitle}</p>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 mb-8">
-                    <h3 class="text-2xl font-bold mb-3">Introducción a la Unidad</h3>
-                    <p class="text-slate-600 leading-relaxed">${data.intro}</p>
-                </div>
-                <h3 class="text-2xl font-bold mb-4">Tareas Prácticas</h3>
-                <div class="space-y-3">${tasksHTML}</div>
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-xl mt-8">
-                     <h4 class="font-bold text-lg text-blue-900 mb-2">Fundamento Bíblico</h4>
-                     <p class="text-blue-800/90 italic">"${data.scripture.verse}"</p>
-                     <p class="text-right font-semibold text-sm mt-2 text-blue-700/80">${data.scripture.ref}</p>
-                </div>
+                <section id="${data.id}" class="unit-content mb-16">
+                    <h1 class="text-4xl font-bold mb-2">${data.title}</h1>
+                    <p class="text-lg text-slate-500 mb-6">${data.subtitle}</p>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 mb-8">
+                        <h3 class="text-2xl font-bold mb-3">Introducción a la Unidad</h3>
+                        <p class="text-slate-600 leading-relaxed">${data.intro}</p>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Tareas Prácticas</h3>
+                    <div class="space-y-3">${tasksHTML}</div>
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-xl mt-8">
+                         <h4 class="font-bold text-lg text-blue-900 mb-2">Fundamento Bíblico</h4>
+                         <p class="text-blue-800/90 italic">"${data.scripture.verse}"</p>
+                         <p class="text-right font-semibold text-sm mt-2 text-blue-700/80">${data.scripture.ref}</p>
+                    </div>
+                </section>
             `;
         }
         
-        for (const unitId in unitsData) {
-            document.getElementById(unitId).innerHTML = createUnitHTML(unitId, unitsData[unitId]);
-        }
+        Object.values(unitsData).forEach(unit => {
+            dynamicUnitsContainer.innerHTML += createUnitHTML(unit);
+        });
 
         const navLinks = document.querySelectorAll('#navigation-menu a');
         const unitContents = document.querySelectorAll('.unit-content');
         let myChart;
-
-        function showUnit(unitId) {
-            unitContents.forEach(content => {
-                content.classList.add('hidden');
-            });
-            document.getElementById(unitId).classList.remove('hidden');
-
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.dataset.unit === unitId) {
-                    link.classList.add('active');
-                }
-            });
-
-            if (myChart) {
-                const unitIndex = parseInt(unitId.split('-')[1]);
-                myChart.setActiveElements([{ datasetIndex: 0, index: unitIndex }]);
-                myChart.update();
-            }
-        }
         
         function setupAccordions() {
             const accordionHeaders = document.querySelectorAll('.accordion-header');
@@ -378,15 +369,7 @@
                 });
             });
         }
-
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const unitId = link.dataset.unit;
-                showUnit(unitId);
-            });
-        });
-
+        
         function createChart() {
             const ctx = document.getElementById('overviewChart').getContext('2d');
             const labels = [
@@ -432,15 +415,48 @@
                     onClick: (event, elements) => {
                         if (elements.length > 0) {
                             const clickedIndex = elements[0].index;
-                            const unitId = 'unit-' + clickedIndex;
-                            showUnit(unitId);
+                            document.getElementById('unit-' + clickedIndex).scrollIntoView();
                         }
                     }
                 }
             });
         }
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const id = entry.target.getAttribute('id');
+                const navLink = document.querySelector(`#navigation-menu a[data-unit="${id}"]`);
 
-        showUnit('unit-0');
+                if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+                    navLinks.forEach(link => link.classList.remove('active'));
+                    if(navLink) navLink.classList.add('active');
+
+                     if (myChart) {
+                        const unitIndex = parseInt(id.split('-')[1]);
+                        myChart.setActiveElements([{ datasetIndex: 0, index: unitIndex }]);
+                        myChart.update();
+                    }
+                }
+            });
+        }, {
+            root: document.querySelector('#content-area'),
+            threshold: 0.5
+        });
+
+        unitContents.forEach(section => {
+            observer.observe(section);
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                const unitId = e.currentTarget.getAttribute('href');
+                if(unitId.startsWith('#')) {
+                    e.preventDefault();
+                    document.querySelector(unitId).scrollIntoView();
+                }
+            });
+        });
+
         setupAccordions();
         createChart();
     });
@@ -448,3 +464,4 @@
 
 </body>
 </html>
+
