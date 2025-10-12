@@ -8,43 +8,45 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Sober Contemplation -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Modern Slate -->
     <!-- Application Structure Plan: He diseñado la aplicación como un panel de control para el crecimiento espiritual. La estructura consta de una barra de navegación lateral fija que enumera las 10 unidades de estudio, permitiendo un acceso no lineal e inmediato a cualquier tema. El área de contenido principal muestra dinámicamente la unidad seleccionada. Cada unidad se divide en tres secciones claras: la 'Introducción' teológica, las 'Tareas Prácticas' interactivas presentadas en formato de acordeón para fomentar la participación activa en lugar de la lectura pasiva, y una sección de 'Fundamento Bíblico'. Esta arquitectura fue elegida para transformar un documento lineal en una herramienta de estudio personal y enfocada, donde el usuario puede concentrarse en las áreas de mayor relevancia para su santificación personal, facilitando una experiencia de usuario más intuitiva y reflexiva. -->
     <!-- Visualization & Content Choices: Información del Informe: Las 10 unidades de estudio sobre la santificación. -> Objetivo: Crear un mapa visual del temario y un punto central de navegación. -> Método de Visualización: Un gráfico de dona (Doughnut Chart) con Chart.js/Canvas, donde cada uno de los 10 segmentos representa una unidad temática. -> Interacción: Al hacer clic en un segmento del gráfico, se navega a la unidad correspondiente, y viceversa. -> Justificación: Este gráfico no representa datos cuantitativos, sino que funciona como un ancla visual que comunica la naturaleza integral del "Camino a la Piedad", mostrando cómo cada área forma parte de un todo unificado en el proceso de santificación. Para las 'Tareas Prácticas', que son textuales, se eligió un formato de acordeón (HTML/CSS/JS) para organizar la información de forma limpia y promover la interacción directa del usuario con cada punto de autoexamen. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
-            font-family: 'Lato', sans-serif;
-            background-color: #F8F6F2;
-            color: #403A3A;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #334155; /* slate-700 */
         }
         h1, h2, h3, h4 {
-            font-family: 'Merriweather', serif;
-            color: #2F2A2A;
+            color: #1e293b; /* slate-800 */
+            font-weight: 700;
         }
         .nav-item {
             transition: all 0.2s ease-in-out;
         }
         .nav-item.active {
-            background-color: #EAE3D9;
-            color: #A97A50;
-            border-right: 4px solid #A97A50;
+            background-color: #e2e8f0; /* slate-200 */
+            color: #2563eb; /* blue-600 */
         }
         .nav-item:not(.active):hover {
-            background-color: #F1ECE6;
+            background-color: #f1f5f9; /* slate-100 */
         }
         .accordion-header {
             cursor: pointer;
             transition: background-color 0.2s ease;
         }
         .accordion-header:hover {
-            background-color: #F1ECE6;
+            background-color: #f1f5f9; /* slate-100 */
         }
         .accordion-content {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease-out;
+        }
+        .chevron {
+            transition: transform 0.3s ease-out;
         }
         .chart-container {
             position: relative;
@@ -65,23 +67,23 @@
 <body class="antialiased">
 
     <div class="flex flex-col lg:flex-row min-h-screen">
-        <nav class="w-full lg:w-1/4 xl:w-1/5 bg-[#F0EBE4] shadow-md border-r border-gray-200/50 flex-shrink-0">
-            <div class="p-6 border-b border-gray-300/60">
+        <nav class="w-full lg:w-1/4 xl:w-1/5 bg-white border-r border-slate-200 flex-shrink-0">
+            <div class="p-6 border-b border-slate-200">
                 <h2 class="text-2xl font-bold text-center">Camino a la Piedad</h2>
-                <p class="text-sm text-center text-gray-600 mt-1">Un temario para la santificación</p>
+                <p class="text-sm text-center text-slate-500 mt-1">Un temario para la santificación</p>
             </div>
             <ul id="navigation-menu" class="space-y-1 p-2">
-                <li><a href="#" data-unit="unit-0" class="nav-item block p-4 rounded-lg font-semibold text-gray-700 active">Introducción General</a></li>
-                <li><a href="#" data-unit="unit-1" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">1. La Pureza de la Adoración</a></li>
-                <li><a href="#" data-unit="unit-2" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">2. Lucha contra el Pecado</a></li>
-                <li><a href="#" data-unit="unit-3" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">3. Gobernando las Afecciones</a></li>
-                <li><a href="#" data-unit="unit-4" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">4. La Batalla por la Mente</a></li>
-                <li><a href="#" data-unit="unit-5" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">5. La Pureza Sexual</a></li>
-                <li><a href="#" data-unit="unit-6" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">6. Patrones de Pecado</a></li>
-                <li><a href="#" data-unit="unit-7" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">7. Mayordomía Fiel</a></li>
-                <li><a href="#" data-unit="unit-8" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">8. El Cuidado del Templo</a></li>
-                <li><a href="#" data-unit="unit-9" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">9. Viviendo en Comunidad</a></li>
-                <li><a href="#" data-unit="unit-10" class="nav-item block p-4 rounded-lg font-semibold text-gray-700">10. Identidad y Propósito</a></li>
+                <li><a href="#" data-unit="unit-0" class="nav-item block p-4 rounded-lg font-semibold text-slate-600 active">Introducción General</a></li>
+                <li><a href="#" data-unit="unit-1" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">1. La Pureza de la Adoración</a></li>
+                <li><a href="#" data-unit="unit-2" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">2. Lucha contra el Pecado</a></li>
+                <li><a href="#" data-unit="unit-3" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">3. Gobernando las Afecciones</a></li>
+                <li><a href="#" data-unit="unit-4" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">4. La Batalla por la Mente</a></li>
+                <li><a href="#" data-unit="unit-5" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">5. La Pureza Sexual</a></li>
+                <li><a href="#" data-unit="unit-6" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">6. Patrones de Pecado</a></li>
+                <li><a href="#" data-unit="unit-7" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">7. Mayordomía Fiel</a></li>
+                <li><a href="#" data-unit="unit-8" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">8. El Cuidado del Templo</a></li>
+                <li><a href="#" data-unit="unit-9" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">9. Viviendo en Comunidad</a></li>
+                <li><a href="#" data-unit="unit-10" class="nav-item block p-4 rounded-lg font-semibold text-slate-600">10. Identidad y Propósito</a></li>
             </ul>
         </nav>
 
@@ -89,12 +91,12 @@
             
             <section id="unit-0" class="unit-content">
                 <h1 class="text-4xl font-bold mb-4">Un Instrumento para la Santificación</h1>
-                <p class="text-lg text-gray-700 leading-relaxed mb-6">
+                <p class="text-lg text-slate-600 leading-relaxed mb-8">
                     La vida cristiana no es un programa de superación personal, sino un proceso de transformación sobrenatural llamado santificación. Es la obra progresiva del Espíritu Santo mediante la cual somos conformados a la imagen de Cristo. Este temario no ofrece fórmulas mágicas, sino que busca ser un instrumento para el autoexamen bíblico, la oración y la obediencia. El objetivo no es meramente alcanzar una "sanidad interior", sino crecer en piedad, mortificando el pecado que aún mora en nosotros y viviendo para la gloria de Aquel que nos compró con Su sangre.
                 </p>
-                <div class="bg-white/70 p-6 rounded-2xl shadow-sm border border-gray-200/80">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80">
                     <h3 class="text-2xl font-bold mb-4 text-center">Las Diez Áreas de Crecimiento</h3>
-                    <p class="text-center text-gray-600 mb-6">Este gráfico representa las diez áreas fundamentales del temario. Cada sección es una parte integral del camino a la piedad. Haga clic en un segmento para explorar la unidad correspondiente.</p>
+                    <p class="text-center text-slate-500 mb-6">Este gráfico representa las diez áreas fundamentales del temario. Cada sección es una parte integral del camino a la piedad. Haga clic en un segmento para explorar la unidad correspondiente.</p>
                     <div class="chart-container">
                         <canvas id="overviewChart"></canvas>
                     </div>
@@ -103,95 +105,95 @@
             
             <section id="unit-1" class="unit-content hidden">
                 <h1 class="text-4xl font-bold mb-2">Unidad 1: La Pureza de Nuestra Adoración</h1>
-                <p class="text-lg text-gray-500 mb-6">(Fe y Vida Espiritual)</p>
+                <p class="text-lg text-slate-500 mb-6">(Fe y Vida Espiritual)</p>
                 
-                <div class="bg-white/70 p-6 rounded-2xl shadow-sm border border-gray-200/80 mb-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 mb-8">
                     <h3 class="text-2xl font-bold mb-3">Introducción a la Unidad</h3>
-                    <p class="text-gray-700 leading-relaxed">El primer y más grande mandamiento es amar a Dios con todo nuestro ser. Toda nuestra vida debe ser un acto de adoración. Sin embargo, nuestro corazón caído es una fábrica de ídolos, y fácilmente nos desviamos hacia formas de adoración corruptas. Ya sea a través del ocultismo explícito o de la religiosidad sutil que pone la confianza en ritos y no en Cristo, cualquier cosa que desvíe nuestra fe del Dios Trino revelado en las Escrituras es idolatría. Nuestra primera responsabilidad como creyentes es derribar esos ídolos, arrepentirnos de nuestra autosuficiencia y volver a una adoración en espíritu y en verdad, fundamentada solo en Cristo.</p>
+                    <p class="text-slate-600 leading-relaxed">El primer y más grande mandamiento es amar a Dios con todo nuestro ser. Toda nuestra vida debe ser un acto de adoración. Sin embargo, nuestro corazón caído es una fábrica de ídolos, y fácilmente nos desviamos hacia formas de adoración corruptas. Ya sea a través del ocultismo explícito o de la religiosidad sutil que pone la confianza en ritos y no en Cristo, cualquier cosa que desvíe nuestra fe del Dios Trino revelado en las Escrituras es idolatría. Nuestra primera responsabilidad como creyentes es derribar esos ídolos, arrepentirnos de nuestra autosuficiencia y volver a una adoración en espíritu y en verdad, fundamentada solo en Cristo.</p>
                 </div>
                 
                 <h3 class="text-2xl font-bold mb-4">Tareas Prácticas</h3>
                 <div class="space-y-3">
-                    <div class="bg-white/70 rounded-2xl border border-gray-200/80 shadow-sm">
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
                         <div class="accordion-header p-5 flex justify-between items-center">
                             <h4 class="font-semibold text-lg">1. Examen de Idolatría</h4>
-                            <span class="text-2xl font-light text-gray-500 transform transition-transform duration-300">+</span>
+                            <span class="chevron text-2xl font-light text-slate-400">&#x276F;</span>
                         </div>
-                        <div class="accordion-content px-5 pb-5">
-                            <p class="text-gray-600">Conforme a Éxodo 20:3-6, examina tu vida en busca de ídolos. Anota cualquier práctica (astrología, amuletos, supersticiones) o persona (líder espiritual, familiar) en la que hayas depositado una confianza que solo le corresponde a Dios. Identifica objetos en tu posesión que estén ligados a falsas religiones o al ocultismo y, en un acto de obediencia, destrúyelos como hicieron los creyentes en Hechos 19:19.</p>
+                        <div class="accordion-content">
+                            <p class="text-slate-600 p-5">Conforme a Éxodo 20:3-6, examina tu vida en busca de ídolos. Anota cualquier práctica (astrología, amuletos, supersticiones) o persona (líder espiritual, familiar) en la que hayas depositado una confianza que solo le corresponde a Dios. Identifica objetos en tu posesión que estén ligados a falsas religiones o al ocultismo y, en un acto de obediencia, destrúyelos como hicieron los creyentes en Hechos 19:19.</p>
                         </div>
                     </div>
-                    <div class="bg-white/70 rounded-2xl border border-gray-200/80 shadow-sm">
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
                         <div class="accordion-header p-5 flex justify-between items-center">
                             <h4 class="font-semibold text-lg">2. Oración de Arrepentimiento y Consagración</h4>
-                            <span class="text-2xl font-light text-gray-500 transform transition-transform duration-300">+</span>
+                            <span class="chevron text-2xl font-light text-slate-400">&#x276F;</span>
                         </div>
-                        <div class="accordion-content px-5 pb-5">
-                            <p class="text-gray-600">Ora confesando específicamente cada forma de idolatría y falsa confianza. Renuncia a ellas y a toda influencia espiritual que no provenga del Espíritu Santo. Consagra nuevamente tu vida, tu mente, tu voluntad y tu futuro al señorío exclusivo de Jesucristo.</p>
+                        <div class="accordion-content">
+                            <p class="text-slate-600 p-5">Ora confesando específicamente cada forma de idolatría y falsa confianza. Renuncia a ellas y a toda influencia espiritual que no provenga del Espíritu Santo. Consagra nuevamente tu vida, tu mente, tu voluntad y tu futuro al señorío exclusivo de Jesucristo.</p>
                         </div>
                     </div>
-                    <div class="bg-white/70 rounded-2xl border border-gray-200/80 shadow-sm">
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
                         <div class="accordion-header p-5 flex justify-between items-center">
                             <h4 class="font-semibold text-lg">3. Análisis de la Ortodoxia Práctica</h4>
-                            <span class="text-2xl font-light text-gray-500 transform transition-transform duration-300">+</span>
+                            <span class="chevron text-2xl font-light text-slate-400">&#x276F;</span>
                         </div>
-                        <div class="accordion-content px-5 pb-5">
-                            <p class="text-gray-600">Evalúa tu vida de iglesia. ¿Tu participación se basa en la costumbre y la apariencia (religiosidad), o en un amor genuino por Cristo y Su pueblo? ¿Manifiestas un espíritu enseñable y sumiso a la predicación de la Palabra, o uno crítico y rebelde?</p>
+                        <div class="accordion-content">
+                            <p class="text-slate-600 p-5">Evalúa tu vida de iglesia. ¿Tu participación se basa en la costumbre y la apariencia (religiosidad), o en un amor genuino por Cristo y Su pueblo? ¿Manifiestas un espíritu enseñable y sumiso a la predicación de la Palabra, o uno crítico y rebelde?</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-amber-50/50 border-l-4 border-[#A97A50] p-6 rounded-xl mt-8">
-                     <h4 class="font-bold text-lg mb-2">Fundamento Bíblico</h4>
-                     <p class="text-gray-700 italic">"No tendrás dioses ajenos delante de mí. No te harás imagen, ni ninguna semejanza de lo que esté arriba en el cielo, ni abajo en la tierra..."</p>
-                     <p class="text-right font-semibold text-sm mt-2 text-gray-600">- Éxodo 20:3-4</p>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-xl mt-8">
+                     <h4 class="font-bold text-lg text-blue-900 mb-2">Fundamento Bíblico</h4>
+                     <p class="text-blue-800/90 italic">"No tendrás dioses ajenos delante de mí. No te harás imagen, ni ninguna semejanza de lo que esté arriba en el cielo, ni abajo en la tierra..."</p>
+                     <p class="text-right font-semibold text-sm mt-2 text-blue-700/80">- Éxodo 20:3-4</p>
                 </div>
             </section>
             
             <section id="unit-2" class="unit-content hidden">
                  <h1 class="text-4xl font-bold mb-2">Unidad 2: La Lucha contra el Pecado que Mora en Nosotros</h1>
-                <p class="text-lg text-gray-500 mb-6">(Hábitos Pecaminosos)</p>
+                <p class="text-lg text-slate-500 mb-6">(Hábitos Pecaminosos)</p>
 
-                <div class="bg-white/70 p-6 rounded-2xl shadow-sm border border-gray-200/80 mb-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 mb-8">
                     <h3 class="text-2xl font-bold mb-3">Introducción a la Unidad</h3>
-                    <p class="text-gray-700 leading-relaxed">La justificación nos declara justos ante Dios, pero no erradica la presencia del pecado en nuestra carne. El creyente se encuentra en una batalla constante: el Espíritu lucha contra la carne, y la carne contra el Espíritu. Los "hábitos pecaminosos" no son meros defectos de carácter, sino las manifestaciones externas de la corrupción que aún reside en nosotros. La victoria no se encuentra en nuestra fuerza de voluntad, sino en la "mortificación del pecado por el Espíritu". Nuestra responsabilidad es no hacer provisión para la carne, sino, por fe, considerarnos muertos al pecado y vivos para Dios en Cristo Jesús.</p>
+                    <p class="text-slate-600 leading-relaxed">La justificación nos declara justos ante Dios, pero no erradica la presencia del pecado en nuestra carne. El creyente se encuentra en una batalla constante: el Espíritu lucha contra la carne, y la carne contra el Espíritu. Los "hábitos pecaminosos" no son meros defectos de carácter, sino las manifestaciones externas de la corrupción que aún reside en nosotros. La victoria no se encuentra en nuestra fuerza de voluntad, sino en la "mortificación del pecado por el Espíritu". Nuestra responsabilidad es no hacer provisión para la carne, sino, por fe, considerarnos muertos al pecado y vivos para Dios en Cristo Jesús.</p>
                 </div>
                 
                 <h3 class="text-2xl font-bold mb-4">Tareas Prácticas</h3>
                 <div class="space-y-3">
-                    <div class="bg-white/70 rounded-2xl border border-gray-200/80 shadow-sm">
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
                         <div class="accordion-header p-5 flex justify-between items-center">
                             <h4 class="font-semibold text-lg">1. Identificación de las Obras de la Carne</h4>
-                            <span class="text-2xl font-light text-gray-500 transform transition-transform duration-300">+</span>
+                            <span class="chevron text-2xl font-light text-slate-400">&#x276F;</span>
                         </div>
-                        <div class="accordion-content px-5 pb-5">
-                            <p class="text-gray-600">Lee Gálatas 5:19-21. Honestamente, identifica cuáles de estas "obras de la carne" se manifiestan habitualmente en tu vida (ira, contiendas, celos, inmoralidad, etc.). Analiza las circunstancias (personas, lugares, estados de ánimo) que suelen preceder a la caída en estos pecados.</p>
+                        <div class="accordion-content">
+                            <p class="text-slate-600 p-5">Lee Gálatas 5:19-21. Honestamente, identifica cuáles de estas "obras de la carne" se manifiestan habitualmente en tu vida (ira, contiendas, celos, inmoralidad, etc.). Analiza las circunstancias (personas, lugares, estados de ánimo) que suelen preceder a la caída en estos pecados.</p>
                         </div>
                     </div>
-                    <div class="bg-white/70 rounded-2xl border border-gray-200/80 shadow-sm">
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
                         <div class="accordion-header p-5 flex justify-between items-center">
                             <h4 class="font-semibold text-lg">2. Examen del Corazón (Orgullo y Rebeldía)</h4>
-                            <span class="text-2xl font-light text-gray-500 transform transition-transform duration-300">+</span>
+                            <span class="chevron text-2xl font-light text-slate-400">&#x276F;</span>
                         </div>
-                        <div class="accordion-content px-5 pb-5">
-                            <p class="text-gray-600">El orgullo es la raíz de toda desobediencia. Evalúa tu respuesta a la corrección, tu disposición a someterte a la autoridad bíblica y tu rapidez para confesar tus faltas. Reflexiona sobre cómo tu orgullo te lleva a justificarte en lugar de arrepentirte.</p>
+                        <div class="accordion-content">
+                            <p class="text-slate-600 p-5">El orgullo es la raíz de toda desobediencia. Evalúa tu respuesta a la corrección, tu disposición a someterte a la autoridad bíblica y tu rapidez para confesar tus faltas. Reflexiona sobre cómo tu orgullo te lleva a justificarte en lugar de arrepentirte.</p>
                         </div>
                     </div>
-                    <div class="bg-white/70 rounded-2xl border border-gray-200/80 shadow-sm">
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
                         <div class="accordion-header p-5 flex justify-between items-center">
                             <h4 class="font-semibold text-lg">3. Disciplina del Arrepentimiento</h4>
-                            <span class="text-2xl font-light text-gray-500 transform transition-transform duration-300">+</span>
+                            <span class="chevron text-2xl font-light text-slate-400">&#x276F;</span>
                         </div>
-                        <div class="accordion-content px-5 pb-5">
-                            <p class="text-gray-600">Practica la confesión diaria y específica de tus pecados a Dios (1 Juan 1:9). Define pasos prácticos y radicales para "hacer morir" las prácticas pecaminosas (Ej. cortar una amistad, cambiar una rutina). Si has pecado contra otros, busca la reconciliación y haz restitución, como un fruto visible de tu arrepentimiento (Lucas 19:8).</p>
+                        <div class="accordion-content">
+                            <p class="text-slate-600 p-5">Practica la confesión diaria y específica de tus pecados a Dios (1 Juan 1:9). Define pasos prácticos y radicales para "hacer morir" las prácticas pecaminosas (Ej. cortar una amistad, cambiar una rutina). Si has pecado contra otros, busca la reconciliación y haz restitución, como un fruto visible de tu arrepentimiento (Lucas 19:8).</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-amber-50/50 border-l-4 border-[#A97A50] p-6 rounded-xl mt-8">
-                     <h4 class="font-bold text-lg mb-2">Fundamento Bíblico</h4>
-                     <p class="text-gray-700 italic">"Así también vosotros consideraos muertos al pecado, pero vivos para Dios en Cristo Jesús, Señor nuestro. No reine, pues, el pecado en vuestro cuerpo mortal, de modo que lo obedezcáis en sus concupiscencias."</p>
-                     <p class="text-right font-semibold text-sm mt-2 text-gray-600">- Romanos 6:11-12</p>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-xl mt-8">
+                     <h4 class="font-bold text-lg text-blue-900 mb-2">Fundamento Bíblico</h4>
+                     <p class="text-blue-800/90 italic">"Así también vosotros consideraos muertos al pecado, pero vivos para Dios en Cristo Jesús, Señor nuestro. No reine, pues, el pecado en vuestro cuerpo mortal, de modo que lo obedezcáis en sus concupiscencias."</p>
+                     <p class="text-right font-semibold text-sm mt-2 text-blue-700/80">- Romanos 6:11-12</p>
                 </div>
             </section>
             
@@ -303,30 +305,30 @@
 
         function createUnitHTML(unitId, data) {
             let tasksHTML = data.tasks.map(task => `
-                <div class="bg-white/70 rounded-2xl border border-gray-200/80 shadow-sm">
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
                     <div class="accordion-header p-5 flex justify-between items-center">
                         <h4 class="font-semibold text-lg">${task.title}</h4>
-                        <span class="text-2xl font-light text-gray-500 transform transition-transform duration-300">+</span>
+                        <span class="chevron text-2xl font-light text-slate-400">&#x276F;</span>
                     </div>
-                    <div class="accordion-content px-5 pb-5">
-                        <p class="text-gray-600">${task.content}</p>
+                    <div class="accordion-content">
+                        <p class="text-slate-600 p-5">${task.content}</p>
                     </div>
                 </div>
             `).join('');
 
             return `
                 <h1 class="text-4xl font-bold mb-2">${data.title}</h1>
-                <p class="text-lg text-gray-500 mb-6">${data.subtitle}</p>
-                <div class="bg-white/70 p-6 rounded-2xl shadow-sm border border-gray-200/80 mb-8">
+                <p class="text-lg text-slate-500 mb-6">${data.subtitle}</p>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 mb-8">
                     <h3 class="text-2xl font-bold mb-3">Introducción a la Unidad</h3>
-                    <p class="text-gray-700 leading-relaxed">${data.intro}</p>
+                    <p class="text-slate-600 leading-relaxed">${data.intro}</p>
                 </div>
                 <h3 class="text-2xl font-bold mb-4">Tareas Prácticas</h3>
                 <div class="space-y-3">${tasksHTML}</div>
-                <div class="bg-amber-50/50 border-l-4 border-[#A97A50] p-6 rounded-xl mt-8">
-                     <h4 class="font-bold text-lg mb-2">Fundamento Bíblico</h4>
-                     <p class="text-gray-700 italic">"${data.scripture.verse}"</p>
-                     <p class="text-right font-semibold text-sm mt-2 text-gray-600">${data.scripture.ref}</p>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-xl mt-8">
+                     <h4 class="font-bold text-lg text-blue-900 mb-2">Fundamento Bíblico</h4>
+                     <p class="text-blue-800/90 italic">"${data.scripture.verse}"</p>
+                     <p class="text-right font-semibold text-sm mt-2 text-blue-700/80">${data.scripture.ref}</p>
                 </div>
             `;
         }
@@ -364,14 +366,14 @@
             accordionHeaders.forEach(header => {
                 header.addEventListener('click', () => {
                     const content = header.nextElementSibling;
-                    const icon = header.querySelector('span');
+                    const icon = header.querySelector('.chevron');
                     
                     if (content.style.maxHeight) {
                         content.style.maxHeight = null;
                         icon.style.transform = 'rotate(0deg)';
                     } else {
                         content.style.maxHeight = content.scrollHeight + 'px';
-                        icon.style.transform = 'rotate(45deg)';
+                        icon.style.transform = 'rotate(90deg)';
                     }
                 });
             });
@@ -399,11 +401,11 @@
                         label: 'Unidades',
                         data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                         backgroundColor: [
-                            '#D8C4B0', '#A97A50', '#826C5C', '#C4AFA0', '#9D897A',
-                            '#B29A86', '#E4D5C7', '#C2AC99', '#A38F7E', '#8D7B6D', '#786A5F'
+                            '#94a3b8', '#3b82f6', '#475569', '#60a5fa', '#64748b',
+                            '#93c5fd', '#94a3b8', '#bfdbfe', '#a1a1aa', '#374151', '#4b5563'
                         ],
-                        borderColor: '#F8F6F2',
-                        borderWidth: 3,
+                        borderColor: '#f8fafc',
+                        borderWidth: 4,
                         hoverOffset: 15,
                     }]
                 },
@@ -418,8 +420,7 @@
                         tooltip: {
                             bodyFont: {
                                 size: 14,
-                                weight: 'bold',
-                                family: "'Lato', sans-serif"
+                                family: "'Inter', sans-serif"
                             },
                             callbacks: {
                                 label: function(context) {
