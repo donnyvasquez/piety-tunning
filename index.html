@@ -68,6 +68,18 @@
         .unit-content {
             scroll-margin-top: 2rem;
         }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -156,6 +168,11 @@
                      <p class="text-blue-800/90 italic">"No tendrás dioses ajenos delante de mí. No te harás imagen, ni ninguna semejanza de lo que esté arriba en el cielo, ni abajo en la tierra..."</p>
                      <p class="text-right font-semibold text-sm mt-2 text-blue-700/80">- Éxodo 20:3-4</p>
                 </div>
+
+                <div class="mt-8 pt-8 border-t border-slate-200 flex flex-col sm:flex-row gap-4" data-unit-id="unit-1">
+                    <button class="gemini-prayer-btn flex-1 bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-200">✨ Generar Oración Personal</button>
+                    <button class="gemini-plan-btn flex-1 bg-slate-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-800 transition-colors duration-200">✨ Crear Plan de Acción</button>
+                </div>
             </section>
             
             <section id="unit-2" class="unit-content mb-16">
@@ -203,13 +220,52 @@
                      <p class="text-blue-800/90 italic">"Así también vosotros consideraos muertos al pecado, pero vivos para Dios en Cristo Jesús, Señor nuestro. No reine, pues, el pecado en vuestro cuerpo mortal, de modo que lo obedezcáis en sus concupiscencias."</p>
                      <p class="text-right font-semibold text-sm mt-2 text-blue-700/80">- Romanos 6:11-12</p>
                 </div>
+
+                 <div class="mt-8 pt-8 border-t border-slate-200 flex flex-col sm:flex-row gap-4" data-unit-id="unit-2">
+                    <button class="gemini-prayer-btn flex-1 bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-200">✨ Generar Oración Personal</button>
+                    <button class="gemini-plan-btn flex-1 bg-slate-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-800 transition-colors duration-200">✨ Crear Plan de Acción</button>
+                </div>
             </section>
             
             <div id="dynamic-units"></div>
         </main>
     </div>
 
+    <!-- Gemini Modal -->
+    <div id="gemini-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl flex flex-col max-h-[90vh]">
+            <div class="p-5 border-b border-slate-200 flex justify-between items-center">
+                <h3 id="modal-title" class="text-2xl font-bold">Respuesta de la IA</h3>
+                <button id="modal-close-btn" class="text-slate-400 hover:text-slate-700 text-3xl">&times;</button>
+            </div>
+            <div id="modal-content-wrapper" class="p-6 overflow-y-auto">
+                <div id="modal-loader" class="flex justify-center items-center py-10">
+                    <div class="loader"></div>
+                </div>
+                <div id="modal-content" class="text-slate-600 leading-relaxed prose max-w-none"></div>
+            </div>
+            <div class="p-4 bg-slate-50 border-t border-slate-200 rounded-b-2xl flex justify-end">
+                 <button id="modal-copy-btn" class="bg-slate-200 text-slate-700 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 transition-colors duration-200">Copiar</button>
+            </div>
+        </div>
+    </div>
+
 <script>
+    const staticUnits = {
+        "unit-1": {
+            id: "unit-1",
+            title: "Unidad 1: La Pureza de Nuestra Adoración",
+            intro: document.querySelector('#unit-1 .leading-relaxed').textContent,
+            tasks: Array.from(document.querySelectorAll('#unit-1 .accordion-content p')).map(p => ({ title: p.parentElement.previousElementSibling.querySelector('h4').textContent, content: p.textContent }))
+        },
+        "unit-2": {
+            id: "unit-2",
+            title: "Unidad 2: La Lucha contra el Pecado que Mora en Nosotros",
+            intro: document.querySelector('#unit-2 .leading-relaxed').textContent,
+            tasks: Array.from(document.querySelectorAll('#unit-2 .accordion-content p')).map(p => ({ title: p.parentElement.previousElementSibling.querySelector('h4').textContent, content: p.textContent }))
+        }
+    };
+
     const unitsData = {
         "unit-3": {
             id: "unit-3",
@@ -311,7 +367,8 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         const dynamicUnitsContainer = document.getElementById('dynamic-units');
-
+        const allUnitsData = { ...staticUnits, ...unitsData };
+        
         function createUnitHTML(data) {
             let tasksHTML = data.tasks.map(task => `
                 <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
@@ -340,6 +397,10 @@
                          <p class="text-blue-800/90 italic">"${data.scripture.verse}"</p>
                          <p class="text-right font-semibold text-sm mt-2 text-blue-700/80">${data.scripture.ref}</p>
                     </div>
+                    <div class="mt-8 pt-8 border-t border-slate-200 flex flex-col sm:flex-row gap-4" data-unit-id="${data.id}">
+                        <button class="gemini-prayer-btn flex-1 bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-200">✨ Generar Oración Personal</button>
+                        <button class="gemini-plan-btn flex-1 bg-slate-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-800 transition-colors duration-200">✨ Crear Plan de Acción</button>
+                    </div>
                 </section>
             `;
         }
@@ -352,9 +413,118 @@
         const unitContents = document.querySelectorAll('.unit-content');
         let myChart;
         
+        const modal = document.getElementById('gemini-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalContent = document.getElementById('modal-content');
+        const modalLoader = document.getElementById('modal-loader');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+        const modalCopyBtn = document.getElementById('modal-copy-btn');
+
+        function showModal(title) {
+            modalTitle.textContent = title;
+            modalContent.innerHTML = '';
+            modalLoader.style.display = 'flex';
+            modal.classList.remove('hidden');
+        }
+
+        function hideModal() {
+            modal.classList.add('hidden');
+        }
+
+        modalCloseBtn.addEventListener('click', hideModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                hideModal();
+            }
+        });
+
+        modalCopyBtn.addEventListener('click', () => {
+            const textToCopy = modalContent.innerText;
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = textToCopy;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextarea);
+            modalCopyBtn.textContent = '¡Copiado!';
+            setTimeout(() => {
+                modalCopyBtn.textContent = 'Copiar';
+            }, 2000);
+        });
+
+        async function callGeminiAPI(prompt, systemPrompt, maxRetries = 3) {
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                }
+            };
+
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        return candidate.content.parts[0].text;
+                    } else {
+                        throw new Error("Respuesta inválida de la API");
+                    }
+                } catch (error) {
+                    if (i === maxRetries - 1) {
+                         return "Lo sentimos, no se pudo generar una respuesta en este momento. Por favor, inténtalo de nuevo más tarde.";
+                    }
+                    await new Promise(res => setTimeout(res, 1000 * (i + 1)));
+                }
+            }
+        }
+
+        function handleGeminiPrayerClick(e) {
+            const unitId = e.target.parentElement.dataset.unitId;
+            const unitData = allUnitsData[unitId];
+            showModal('Generando Oración Personal...');
+            
+            const systemPrompt = "Actúa como un pastor sabio y consejero bíblico, con un estilo similar a Sugel Michelén. Tu tono es sobrio, centrado en la soberanía de Dios y la responsabilidad humana.";
+            const userPrompt = `Basado en la siguiente unidad de estudio sobre '${unitData.title}', genera una oración personal en primera persona (yo). La oración debe guiar a un creyente a confesar sus faltas en esta área, arrepentirse genuinamente, y pedir la ayuda y la gracia de Dios para caminar en santidad. La oración debe ser profunda, bíblica y reflejar una dependencia total en Cristo. Aquí está el contenido de la unidad: Introducción: ${unitData.intro}. Tareas: ${unitData.tasks.map(t => t.title + ": " + t.content).join(' ')}.`;
+
+            callGeminiAPI(userPrompt, systemPrompt).then(response => {
+                modalLoader.style.display = 'none';
+                modalContent.innerHTML = response.replace(/\n/g, '<br>');
+                modalTitle.textContent = 'Oración Personal';
+            });
+        }
+
+        function handleGeminiPlanClick(e) {
+            const unitId = e.target.parentElement.dataset.unitId;
+            const unitData = allUnitsData[unitId];
+            showModal('Generando Plan de Acción...');
+
+            const systemPrompt = "Actúa como un consejero bíblico práctico y sensato. Tu objetivo es ayudar a los creyentes a aplicar la verdad bíblica a su vida diaria.";
+            const userPrompt = `He estudiado la unidad sobre '${unitData.title}'. Basado en su contenido, crea un plan de acción con 3 pasos concretos y realizables que puedo tomar esta semana para crecer en esta área. Para cada paso, proporciona una acción clara y una breve justificación de por qué es importante. El plan debe ser práctico y alentador, formateado como una lista. Aquí está el contenido de la unidad para tu referencia: Introducción: ${unitData.intro}. Tareas: ${unitData.tasks.map(t => t.title + ": " + t.content).join(' ')}.`;
+
+            callGeminiAPI(userPrompt, systemPrompt).then(response => {
+                modalLoader.style.display = 'none';
+                modalContent.innerHTML = response.replace(/\n/g, '<br>');
+                modalTitle.textContent = 'Plan de Acción Semanal';
+            });
+        }
+
+
         function setupAccordions() {
-            const accordionHeaders = document.querySelectorAll('.accordion-header');
-            accordionHeaders.forEach(header => {
+            document.querySelectorAll('.accordion-header').forEach(header => {
                 header.addEventListener('click', () => {
                     const content = header.nextElementSibling;
                     const icon = header.querySelector('.chevron');
@@ -443,7 +613,7 @@
             threshold: 0.5
         });
 
-        unitContents.forEach(section => {
+        document.querySelectorAll('.unit-content').forEach(section => {
             observer.observe(section);
         });
 
@@ -456,6 +626,9 @@
                 }
             });
         });
+        
+        document.querySelectorAll('.gemini-prayer-btn').forEach(btn => btn.addEventListener('click', handleGeminiPrayerClick));
+        document.querySelectorAll('.gemini-plan-btn').forEach(btn => btn.addEventListener('click', handleGeminiPlanClick));
 
         setupAccordions();
         createChart();
@@ -464,4 +637,3 @@
 
 </body>
 </html>
-
